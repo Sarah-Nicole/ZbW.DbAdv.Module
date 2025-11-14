@@ -17,10 +17,11 @@
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+      // Beziehungen definieren
       modelBuilder.Entity<VideoGenre>()
         .HasKey(vg => new { vg.VideoId, vg.GenreId });
 
-      modelBuilder.Entity<VideoGenre>()
+      modelBuilder.Entity<VideoGenre>() 
         .HasOne(vg => vg.Video)
         .WithMany(v => v.VideoGenres)
         .HasForeignKey(vg => vg.VideoId);
