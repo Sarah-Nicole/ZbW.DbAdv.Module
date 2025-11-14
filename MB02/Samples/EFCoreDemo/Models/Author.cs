@@ -8,6 +8,9 @@
         public string? Phone { get; set; }
         public string? Mail { get; set; }
         public string? MobilePhone { get; set; }
+
+        // verändert
+        public string? Gender { get; set; }
 #nullable disable
         public ICollection<Course> Courses { get; set; }
     }
