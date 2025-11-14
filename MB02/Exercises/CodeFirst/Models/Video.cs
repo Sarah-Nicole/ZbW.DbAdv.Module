@@ -20,5 +20,6 @@
 
         //public ICollection<VideoGenre>? VideoGenres { get; set; } // für Many-Beziehung
 
+        public Classification Classification { get; set; }
     }
 }
