@@ -1,0 +1,82 @@
+IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+BEGIN
+    CREATE TABLE [__EFMigrationsHistory] (
+        [MigrationId] nvarchar(150) NOT NULL,
+        [ProductVersion] nvarchar(32) NOT NULL,
+        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+    );
+END;
+GO
+
+BEGIN TRANSACTION;
+CREATE TABLE [Genres] (
+    [Id] tinyint NOT NULL,
+    [Name] nvarchar(255) NOT NULL,
+    CONSTRAINT [PK_Genres] PRIMARY KEY ([Id])
+);
+
+CREATE TABLE [Videos] (
+    [Id] int NOT NULL IDENTITY,
+    [Name] nvarchar(255) NOT NULL,
+    [ReleaseDate] datetime2 NOT NULL,
+    CONSTRAINT [PK_Videos] PRIMARY KEY ([Id])
+);
+
+CREATE TABLE [VideoGenres] (
+    [VideoId] int NOT NULL,
+    [GenreId] tinyint NOT NULL,
+    CONSTRAINT [PK_VideoGenres] PRIMARY KEY ([VideoId], [GenreId]),
+    CONSTRAINT [FK_VideoGenres_Genres_GenreId] FOREIGN KEY ([GenreId]) REFERENCES [Genres] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_VideoGenres_Videos_VideoId] FOREIGN KEY ([VideoId]) REFERENCES [Videos] ([Id]) ON DELETE CASCADE
+);
+
+CREATE INDEX [IX_VideoGenres_GenreId] ON [VideoGenres] ([GenreId]);
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20251110183723_addTables', N'9.0.10');
+
+INSERT INTO genres (id, name) VALUES (1, 'Horror')
+
+INSERT INTO videos (name, releasedate) VALUES ( 'Mein Video', '2008-11-11')
+
+INSERT INTO VideoGenres (VideoId, GenreId) SELECT v.Id, 1 FROM Videos v WHERE v.Name = 'Mein Video';
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20251110184445_updateData', N'9.0.10');
+
+DROP TABLE [VideoGenres];
+
+ALTER TABLE [Videos] ADD [GenreId] tinyint NOT NULL DEFAULT CAST(1 AS tinyint);
+
+CREATE INDEX [IX_Videos_GenreId] ON [Videos] ([GenreId]);
+
+ALTER TABLE [Videos] ADD CONSTRAINT [FK_Videos_Genres_GenreId] FOREIGN KEY ([GenreId]) REFERENCES [Genres] ([Id]) ON DELETE CASCADE;
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20251114193520_updateReferencesOneGenre', N'9.0.10');
+
+ALTER TABLE [Videos] ADD [Classification] int NOT NULL DEFAULT 0;
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20251114194937_updateEnumClassification', N'9.0.10');
+
+CREATE TABLE [Tag] (
+    [Id] int NOT NULL IDENTITY,
+    [Name] nvarchar(max) NOT NULL,
+    CONSTRAINT [PK_Tag] PRIMARY KEY ([Id])
+);
+
+CREATE TABLE [VideoTag] (
+    [VideoId] int NOT NULL,
+    [TagId] int NOT NULL,
+    CONSTRAINT [PK_VideoTag] PRIMARY KEY ([VideoId], [TagId]),
+    CONSTRAINT [FK_VideoTag_Tag_TagId] FOREIGN KEY ([TagId]) REFERENCES [Tag] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_VideoTag_Videos_VideoId] FOREIGN KEY ([VideoId]) REFERENCES [Videos] ([Id]) ON DELETE CASCADE
+);
+
+CREATE INDEX [IX_VideoTag_TagId] ON [VideoTag] ([TagId]);
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20251114201502_AddVideoTagTable', N'9.0.10');
+
+COMMIT;
