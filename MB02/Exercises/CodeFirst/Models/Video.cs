@@ -18,8 +18,8 @@
         // Navigation -> wird benötigt für Context
         public required Genre Genre { get; set; } // Genre darf nicht null sein 
 
-        //public ICollection<VideoGenre>? VideoGenres { get; set; } // für Many-Beziehung
-
         public Classification Classification { get; set; }
+
+        public ICollection<VideoTag>? VideoTag { get; set; } // für Many-Beziehung
     }
 }

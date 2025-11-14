@@ -9,7 +9,7 @@
 
         public DbSet<Genre> Genres { get; set; }
 
-        //public DbSet<VideoGenre> VideoGenres { get; set; }
+        public DbSet<VideoTag> VideoTag { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -17,19 +17,26 @@
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Video>()
+              .HasOne(v => v.Genre)           // Navigation von Video zu Genre
+              .WithMany(g => g.Videos)        // Navigation von Genre zu Videos
+              .HasForeignKey(v => v.GenreId); // FK in Tabelle Video
+
             // Beziehungen definieren
-            //modelBuilder.Entity<VideoGenre>()
-            //  .HasKey(vg => new { vg.VideoId, vg.GenreId });
+            modelBuilder.Entity<VideoTag>() // Verbindungstabelle
+             .HasKey(vt => new { vt.VideoId, vt.TagId });
 
-            //modelBuilder.Entity<VideoGenre>() 
-            //  .HasOne(vg => vg.Video)
-            //  .WithMany(v => v.VideoGenres)
-            //  .HasForeignKey(vg => vg.VideoId);
+            modelBuilder.Entity<VideoTag>() // Video zu Verbindungstabelle
+              .HasOne(vt => vt.Video)
+              .WithMany(v => v.VideoTag)
+              .HasForeignKey(vt => vt.VideoId);
 
-          modelBuilder.Entity<Video>()
-          .HasOne(v => v.Genre)           // Navigation von Video zu Genre
-          .WithMany(g => g.Videos)        // Navigation von Genre zu Videos
-          .HasForeignKey(v => v.GenreId); // FK in Tabelle Video
+            modelBuilder.Entity<VideoTag>() // Tag zu Verbindungstabelle
+               .HasOne(vt => vt.Tag)
+               .WithMany(t => t.VideoTag)
+               .HasForeignKey(vt => vt.TagId);
+
         }
     }
 }
